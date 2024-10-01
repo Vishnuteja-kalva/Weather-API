@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Indicator</title>
+    <style>
+        body {
+            background-image:  url("https://wallpapers.com/images/hd/perfect-weather-with-gradient-sky-ym0nn79vhoqg34v3.jpg");
+            background-size: 1500px 850px;
+            background-repeat: no-repeat;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        input {
+            border: 2px solid rgb(17, 17, 18);
+            border-radius: 5px;
+            height: 40px;
+            width: 350px;
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .input-container {
+            background-image: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5));
+            background-repeat: no-repeat;
+            width: 450px;
+            height: 200px;
+            border-style: outset;
+            padding: 10px 20px;
+            display: block;
+            margin-left: 32%;
+            margin-top: 80px;
+        }
+
+        button {
+            background-color: blue;
+            color: white;
+            border: none;
+            width: 80px;
+            height: 40px;
+        }
+
+        input:hover {
+            background-color: white;
+        }
+
+        button:hover {
+            color: white;
+            background-color: red;
+        }
+
+        .data-container {
+            display: none; 
+            flex-direction: row;
+            justify-content: center;
+            column-gap: 50px;
+            padding: 40px;
+            font-size: larger;
+        }
+
+        .block1, .block2, .block3 {
+            width: fit-content;
+            background-image:url("https://gradient.page/_next/image?url=%2Fcdn%2Fgreen-glory%2Fgreen-glory-003.jpg&w=1920&q=75");
+            border: 2px solid black;
+            padding: 20px;
+            background-repeat: no-repeat;
+            background-size: 310px 400px;
+            border-radius: 20px;
+            border-style: groove;
+            text-decoration:double ;
+            color:azure
+        }
+
+        .data-container img {
+            width: 250px;
+            height: auto;
+            border: 2px whitesmoke solid;
+            border-style: ridge;
+            border-radius: 40px;
+            padding: 5px;
+            margin-bottom: 25px;
+        }
+    </style>
+</head>
+<body>
+    <div class="input-container">
+        <span style="font-family: 'Times New Roman', Times, serif; font-size: larger;">
+            <h1 style="margin-left: 60px;">Weather Indicator</h1>
+            <div class="st-line">
+                <h3>Location:</h3>
+                <input type="text" id="location" placeholder="Enter Name Of The Location">
+                <button type="submit" onclick="display()">Search</button>
+            </div>
+        </span>
+    </div>
+
+    <div class="data-container">
+        <div class="block1">
+            <img src="" alt="gif1" id="g1">
+            <div class="data1" id="d1"></div>
+        </div>
+        <div class="block2">
+            <img src="" alt="gif2" id="g2">
+            <div class="data2" id="d2"></div>
+        </div>
+        <div class="block3">
+            <img src="" alt="gif3" id="g3">
+            <div class="data3" id="d3"></div>
+        </div>
+    </div>
+
+    <script>
+        let gif1 = document.getElementById("g1");
+        let gif2 = document.getElementById("g2");
+        let gif3 = document.getElementById("g3");
+        let data1 = document.getElementById("d1");
+        let data2 = document.getElementById("d2");
+        let data3 = document.getElementById("d3");
+
+        function display() {
+            let value = document.getElementById("location").value.toLowerCase();
+            let weather = [];
+            let gifs = [gif1, gif2, gif3];
+            let data = [data1, data2, data3];
+            let url = `https://api.openweathermap.org/data/2.5/forecast?q=${value}&appid=c10881cc4d2b49b66f6a9965edc60240`;
+            
+
+            fetch(url)
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok");
+                    }
+                    return response.json();
+                })
+                .then((details) => {
+                    let change = document.getElementsByClassName("data-container")[0];
+                    change.style.display = "flex";
+                    document.body.style.backgroundImage="linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)),url('https://wallpapers.com/images/hd/perfect-weather-with-gradient-sky-ym0nn79vhoqg34v3.jpg')";
+
+                    for (let i = 0; i < 3; i++) {
+                        let Date = details.list[i].dt_txt;
+                        let Description = details.list[i].weather[0].description.toLowerCase();
+                        let Wind = details.list[i].wind.speed;
+                        let Temperature = Math.round(details.list[i].main.temp - 273.15);
+                        let Humidity = details.list[i].main.humidity;
+
+                        weather.push({
+                            "Date": `${Date}`,
+                            "Description": Description,
+                            "Wind": `${Wind} m/s`,
+                            "Temperature": `${Temperature} °C`,
+                            "Humidity": `${Humidity}%`
+                        });
+
+                        if (Description == "overcast clouds") {
+                            gifs[i].src = 'https://i.pinimg.com/originals/a2/df/ed/a2dfed0d6579fd43e7edee1dbff9e52d.gif';
+                        } else if (Description.includes("rain")) {
+                            gifs[i].src = "https://i.pinimg.com/originals/ed/52/59/ed5259ee5617fbcea53daa7060681069.gif";
+                        } else if (Description.includes("sun")) {
+                            gifs[i].src = "https://media.tenor.com/yJY8H1AtS2sAAAAM/sun-waving.gif";
+                        } else if (Description == "clear sky" && Temperature >= 40) {
+                            gifs[i].src = "https://cdn.pixabay.com/animation/2023/02/27/11/27/11-27-59-421_512.gif";
+                        } else if (Description == "clear sky") {
+                            gifs[i].src = "https://cdn.pixabay.com/animation/2023/02/02/16/08/16-08-07-79_512.gif";
+                        } else if (Description == "broken clouds") {
+                            gifs[i].src = "https://cdn.dribbble.com/users/6846220/screenshots/20068634/giiiiif.gif";
+                        } else if (Description == "few clouds") {
+                            gifs[i].src = "https://i.pinimg.com/originals/76/e3/f8/76e3f8a2710800715368f40bcded954f.gif";
+                        } else if (Description == "scattered clouds") {
+                            gifs[i].src = "https://media.tenor.com/PLqmB_SmXQMAAAAM/clouds-sky.gif";
+                        } else {
+                            gifs[i].style.backgroundColor = "lightcyan";
+                        }
+
+                        data[i].innerHTML = `Date: ${weather[i].Date}<br>Description: ${weather[i].Description}<br>Wind: ${weather[i].Wind}<br>Temperature: ${weather[i].Temperature}<br>Humidity: ${weather[i].Humidity}`;
+                    }
+                })
+                .catch((error) => {
+                    alert("Unable to fetch data: " + error.message);
+                });
+        }
+    </script>
+</body>
+</html>
